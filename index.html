@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Raksha Bandhan</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #fef5f6;
+        overflow-x: hidden;
+        text-align: center;
+    }
+    .envelope-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+    .envelope {
+        width: 300px;
+        height: 200px;
+        background: #ffcccc;
+        position: relative;
+        border-radius: 5px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .envelope:before, .envelope:after {
+        content: '';
+        position: absolute;
+        width: 0; height: 0;
+        border-style: solid;
+    }
+    .envelope:before {
+        top: 0; left: 0;
+        border-width: 0 150px 100px 150px;
+        border-color: transparent transparent #ff9999 transparent;
+    }
+    .envelope:after {
+        bottom: 0; left: 0;
+        border-width: 100px 150px 0 150px;
+        border-color: #ff9999 transparent transparent transparent;
+    }
+    .btn {
+        margin-top: 20px;
+        padding: 12px 25px;
+        background: #ff6666;
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .btn:hover {
+        background: #ff4d4d;
+    }
+    .memories {
+        display: none;
+        padding: 20px;
+        animation: fadeIn 1s ease forwards;
+    }
+    @keyframes fadeIn {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+    .photos {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .photos img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+   h1 {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 48px;
+    background: linear-gradient(90deg, #ff4d4d, #cb527cff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+}
+
+p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    line-height: 1.6;
+    color: #444;
+    max-width: 700px;
+    margin: auto;
+    padding: 0 15px;
+}
+
+    canvas {
+        position: fixed;
+        top: 0; left: 0;
+        pointer-events: none;
+        z-index: 999;
+    }
+</style>
+</head>
+<body>
+
+<div class="envelope-container" id="startUI">
+    <div class="envelope"></div>
+    <button class="btn" onclick="showMemories()">Tie a Rakhi --💮--</button>
+</div>
+
+<div class="memories" id="memoriesUI">
+    <h1>Happy Raksha Bandhan, Akka ❤️</h1>
+    <p>Dear Sister, you are my best friend, my guide,my piece of heart  and my forever support. On this special day, I’m sending you all my love and sweetest memories we shared. Thank you for being you!</p>
+    <div class="photos">
+        <img src="photo1.jpg" alt="Memory 1">
+        <img src="photo2.jpg" alt="Memory 2">
+        <img src="photo3.jpg" alt="Memory 3">
+    </div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+// Show memories and start confetti
+function showMemories() {
+    document.getElementById('startUI').style.display = 'none';
+    document.getElementById('memoriesUI').style.display = 'block';
+    startConfetti();
+}
+
+// Confetti Animation
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+let W, H;
+let particles = [];
+
+function resizeCanvas() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+function randomColor() {
+    const colors = ['#ff4d4d', '#ffcc00', '#66ccff', '#66ff99', '#ff99ff'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function createParticles(count) {
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: Math.random() * W,
+            y: Math.random() * H - H,
+            r: Math.random() * 6 + 4,
+            d: Math.random() * 50,
+            color: randomColor(),
+            tilt: Math.floor(Math.random() * 10) - 10,
+            tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
+            tiltAngle: 0
+        });
+    }
+}
+
+function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+        ctx.beginPath();
+        ctx.lineWidth = p.r;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r/4, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/4);
+        ctx.stroke();
+    });
+    updateParticles();
+}
+
+function updateParticles() {
+    particles.forEach((p, i) => {
+        p.tiltAngle += p.tiltAngleIncremental;
+        p.y += (Math.cos(p.d) + 3 + p.r/2) / 2;
+        p.tilt = Math.sin(p.tiltAngle - i/3) * 15;
+        if (p.y > H) {
+            particles[i] = {
+                x: Math.random() * W,
+                y: -10,
+                r: p.r,
+                d: p.d,
+                color: p.color,
+                tilt: p.tilt,
+                tiltAngleIncremental: p.tiltAngleIncremental,
+                tiltAngle: p.tiltAngle
+            };
+        }
+    });
+}
+
+function startConfetti() {
+    createParticles(150);
+    (function animloop(){
+        drawParticles();
+        requestAnimationFrame(animloop);
+    })();
+}
+</script>
+
+</body>
+</html>
